@@ -3,7 +3,8 @@ const prisma = new PrismaClient();
 
 exports.checkMigration = async (req, res) => {
     try {
-        const migrations = await prisma.$queryRaw`SELECT * FROM "_prisma_migrations" ORDER BY applied_at DESC LIMIT 1`;  // Get the latest migration
+        // Use the 'finished_at' column to get the latest migration
+        const migrations = await prisma.$queryRaw`SELECT * FROM "_prisma_migrations" ORDER BY finished_at DESC LIMIT 1`;
 
         if (migrations.length === 0) {
             return res.status(200).json({ status: 'No migrations found, database is clean.' });
