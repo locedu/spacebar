@@ -10,3 +10,7 @@ v.0.001
 
 ## notes
 URL: https://spacebar-express.onrender.com/
+
+## completions
+
+- route (register): /api/auth/register
