@@ -4,13 +4,17 @@ const app = express();
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
 
 const { registerRoutes, loginRoutes, profileRoutes } = require("./features");
+const { healthDatabaseConnectRoutes, healthDatabaseMigrationRoutes, healthCorsRoutes } = require('./features/health'); 
 
 app.use(express.json());
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 
 // Health checks
-app.use("/health/database", require("./features/health/database/db.routes"));
-app.use("/health/cors", require("./features/health/cors/cors.routes"));
+app.use("/api/health/cors", healthCorsRoutes);
+app.use("/api/health/database", healthDatabaseConnectRoutes);
+app.use("/api/health/database/migration", healthDatabaseMigrationRoutes);  // Singular for the migration check
+
+
 
 // auth routes: register, login, profile
 app.use("/api/auth", registerRoutes);
