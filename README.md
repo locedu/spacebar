@@ -13,10 +13,14 @@ URL: https://spacebar-express.onrender.com/
 
 ## todo
 
-- JWT authentication middleware for protected routes
-- route (profile): GET /api/auth/me (protected)
+- frontend: register (form)
+- login (form)
+- profile page
+- review next objectives (primary features: posts, newsfeed)
 
 ## completions
 
+- JWT authentication middleware for protected routes
+- route (profile): GET /api/auth/me (protected)
 - route (login): POST /api/auth/login
 - route (register): POST /api/auth/register
