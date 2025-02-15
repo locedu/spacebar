@@ -11,6 +11,10 @@ v.0.001
 ## notes
 URL: https://spacebar-express.onrender.com/
 
+## todo
+
+- route (login): POST /api/auth/login
+
 ## completions
 
-- route (register): /api/auth/register
+- route (register): POST /api/auth/register
