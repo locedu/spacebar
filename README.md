@@ -25,3 +25,6 @@ URL: https://spacebar-express.onrender.com/
 - route (profile): GET /api/auth/me (protected)
 - route (login): POST /api/auth/login
 - route (register): POST /api/auth/register
+- route (health): GET /api/health/database/connect
+- route (health): GET /api/health/database/migration
+- route (health): GET /api/health/cors
