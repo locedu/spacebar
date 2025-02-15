@@ -14,8 +14,9 @@ URL: https://spacebar-express.onrender.com/
 ## todo
 
 - frontend: register (form)
-- login (form)
-- profile page
+- frontend: login (form)
+- frontend: profile page
+- frontend: deployment, integration test
 - review next objectives (primary features: posts, newsfeed)
 
 ## completions
