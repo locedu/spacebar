@@ -20,7 +20,8 @@ URL: https://spacebar-express.onrender.com/
 - review next objectives (primary features: posts, newsfeed)
 
 ## completions
-
+- initial test for route (posts) successful
+- added generic error-handling middleware (app.js)
 - JWT authentication middleware for protected routes
 - route (profile): GET /api/auth/me (protected)
 - route (login): POST /api/auth/login
