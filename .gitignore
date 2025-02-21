@@ -27,8 +27,6 @@ build/
 coverage/
 
 # Prisma (if using)
-prisma/dev.db
-prisma/migrations/
 
 # AWS Elastic Beanstalk specific
 .elasticbeanstalk/
