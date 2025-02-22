@@ -13,12 +13,12 @@ URL: https://spacebar-express.onrender.com/
 
 ## todo
 
-- route (like) - ??
 - basically need to work on frontend, then prioritize next feature set (??)
 - admin role (moderate features)
 - stretch goals.. ??
 
 ## completions
+- - route (like)
 - routes (post, comment)
 - initial test for route (posts) successful
 - added generic error-handling middleware (app.js)
