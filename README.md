@@ -13,13 +13,13 @@ URL: https://spacebar-express.onrender.com/
 
 ## todo
 
-- frontend: register (form)
-- frontend: login (form)
-- frontend: profile page
-- frontend: deployment, integration test
-- review next objectives (primary features: posts, newsfeed)
+- route (like) - ??
+- basically need to work on frontend, then prioritize next feature set (??)
+- admin role (moderate features)
+- stretch goals.. ??
 
 ## completions
+- routes (post, comment)
 - initial test for route (posts) successful
 - added generic error-handling middleware (app.js)
 - JWT authentication middleware for protected routes
