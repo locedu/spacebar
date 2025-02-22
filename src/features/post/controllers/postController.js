@@ -38,6 +38,27 @@ exports.getAllPosts = async (req, res) => {
   }
 };
 
+exports.getPostsLikedByUser = async (req, res) => {
+  const { userId } = req.params; // Get the userId from the request params
+  const { user } = req; // Get the authenticated user's ID from the JWT
+
+  if (user.id !== userId) {
+    return res
+      .status(403)
+      .json({ error: "You can only view your own liked posts" });
+  }
+
+  try {
+    const posts = await postService.getPostsLikedByUser(userId);
+    if (!posts || posts.length === 0) {
+      return res.status(404).json({ error: "No posts liked by this user" });
+    }
+    res.status(200).json(posts); // Return the posts liked by the user
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 // Update an existing post
 exports.updatePost = [
   authMiddleware,

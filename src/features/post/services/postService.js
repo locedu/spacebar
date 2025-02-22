@@ -22,6 +22,10 @@ exports.getAllPostsWithLikesCount = async () => {
   return await postModel.getAllPostsWithLikesCount();
 };
 
+exports.getPostsLikedByUser = async (userId) => {
+  return await postModel.getPostsLikedByUser(userId);
+};
+
 exports.updatePost = async (postId, postData, user) => {
   const existingPost = await postModel.getPost(postId);
   if (!existingPost) {
