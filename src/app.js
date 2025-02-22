@@ -3,7 +3,7 @@ const cors = require("cors");
 const app = express();
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
 
-const { registerRoutes, loginRoutes, profileRoutes, postRoutes, commentRoutes } = require("./features");
+const { registerRoutes, loginRoutes, profileRoutes, postRoutes, commentRoutes, likeRoutes } = require("./features");
 const { healthDatabaseConnectRoutes, healthDatabaseMigrationRoutes, healthCorsRoutes } = require('./features/health'); 
 // const {}
 
@@ -21,6 +21,7 @@ app.use("/api/auth", loginRoutes);
 app.use("/api/auth", profileRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/likes", likeRoutes);
 
 // Catch-all error handler (after all routes)
 app.use((err, req, res, next) => {

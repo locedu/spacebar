@@ -17,6 +17,16 @@ exports.getAllPosts = async () => {
   return await prisma.post.findMany(); // Get all posts
 };
 
+exports.getAllPostsWithLikesCount = async () => {
+  return await prisma.post.findMany({
+    include: {
+      _count: {
+        select: { likes: true },  // Count the number of likes for each post
+      },
+    },
+  });
+};
+
 exports.updatePost = async (postId, postData) => {
   return await prisma.post.update({
     where: { id: postId },

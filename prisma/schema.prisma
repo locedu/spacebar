@@ -49,10 +49,6 @@ model User {
   likes          Like[]    // Posts liked by the user
 }
 
-
-
-
-
 model Post {
   id        String    @id @default(uuid()) // UUID as the primary key
   title     String    // Title of the post
@@ -60,7 +56,9 @@ model Post {
   createdAt DateTime  @default(now()) // Automatically set when the post is created
   updatedAt DateTime  @updatedAt // Automatically updated when the post is modified
   userId    String    // Reference to the user who created the post (UUID)
-  user      User      @relation(fields: [userId], references: [id])
+
+  // CASCADE delete on the related entity (User -> Post)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments  Comment[] // Comments associated with the post
   likes     Like[]    // Likes on the post
 }
@@ -72,8 +70,10 @@ model Comment {
   updatedAt DateTime  @updatedAt // Automatically updated when the comment is modified
   userId    String    // Reference to the user who created the comment (UUID)
   postId    String    // Reference to the post the comment belongs to (UUID)
-  user      User      @relation(fields: [userId], references: [id])
-  post      Post      @relation(fields: [postId], references: [id])
+
+  // CASCADE delete on the related entity (User -> Comment) and (Post -> Comment)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Like {
@@ -81,8 +81,10 @@ model Like {
   createdAt DateTime  @default(now()) // Timestamp when the like is created
   userId    String    // Reference to the user who liked the post (UUID)
   postId    String    // Reference to the post that was liked (UUID)
-  user      User      @relation(fields: [userId], references: [id])
-  post      Post      @relation(fields: [postId], references: [id])
+
+  // CASCADE delete on the related entity (User -> Like) and (Post -> Like)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId]) // Ensure a user can only like a post once
 }
