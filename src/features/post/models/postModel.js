@@ -29,12 +29,18 @@ exports.getAllPosts = async () => {
 exports.getAllPostsWithLikesCount = async () => {
   return await prisma.post.findMany({
     include: {
+      user: {
+        select: {
+          name: true,  // Include the name of the user (or username if you prefer)
+        }
+      },
       _count: {
         select: { likes: true },  // Count the number of likes for each post
       },
     },
   });
 };
+
 
 exports.getPostsLikedByUser = async (userId) => {
   return await prisma.post.findMany({
