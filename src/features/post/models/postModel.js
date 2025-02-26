@@ -38,8 +38,12 @@ exports.getAllPostsWithLikesCount = async () => {
         select: { likes: true },  // Count the number of likes for each post
       },
     },
+    orderBy: {
+      updatedAt: 'desc',  // Sort by 'updatedAt' in descending order
+    },
   });
 };
+
 
 
 exports.getPostsLikedByUser = async (userId) => {
