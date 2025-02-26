@@ -14,8 +14,17 @@ exports.getPost = async (postId) => {
 };
 
 exports.getAllPosts = async () => {
-  return await prisma.post.findMany(); // Get all posts
+  return await prisma.post.findMany({
+    include: {
+      user: {
+        select: {
+          username: true,  // Or 'name' if you want the user's name instead of username
+        }
+      }
+    }
+  });
 };
+
 
 exports.getAllPostsWithLikesCount = async () => {
   return await prisma.post.findMany({
