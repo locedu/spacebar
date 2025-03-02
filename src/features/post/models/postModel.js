@@ -29,10 +29,12 @@ exports.getAllPosts = async () => {
     include: {
       user: {
         select: {
-          username: true,  // Or 'name' if you want the user's name instead of username
-        }
-      }
-    }
+          name: true,
+        },
+      },
+      comments: true,
+      likes: true,
+    },
   });
 };
 
