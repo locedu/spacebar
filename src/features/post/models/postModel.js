@@ -7,19 +7,21 @@ exports.createPost = async (postData) => {
   });
 };
 
-// need to conditionally return email (admins only).. TBD.
 exports.getPost = async (postId) => {
   return await prisma.post.findUnique({
     where: { id: postId },
     include: {
       user: {
         select: {
-          name: true, // ✅ Only include user's name
+          name: true,
         },
       },
+      comments: true,
+      likes: true,
     },
   });
 };
+
 
 
 exports.getAllPosts = async () => {
