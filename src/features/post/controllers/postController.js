@@ -31,7 +31,7 @@ exports.getPost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
   try {
     // const posts = await postService.getAllPosts();
-    const posts = await postService.getAllPostsWithLikesCount();
+    const posts = await postService.getAllPosts();
     res.status(200).json(posts);
   } catch (error) {
     res.status(400).json({ error: error.message });
