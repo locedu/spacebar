@@ -25,8 +25,18 @@ exports.getCommentsByUser = async (userId) => {
 };
 
 exports.getAllComments = async () => {
-  return await prisma.comment.findMany();
+  return await prisma.comment.findMany({
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
 };
+
 
 exports.updateComment = async (commentId, commentData) => {
   return await prisma.comment.update({
