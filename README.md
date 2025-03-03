@@ -18,6 +18,7 @@ URL: https://spacebar-express.onrender.com/
 - stretch goals.. ??
 
 ## completions
+- updated getAllComments (returns user id, name)
 - - route (like)
 - routes (post, comment)
 - initial test for route (posts) successful
