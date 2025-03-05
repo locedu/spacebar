@@ -15,10 +15,12 @@ exports.loginUser = async ({ email, password }) => {
         throw new Error('Invalid email or password');
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ id: user.id, email: user.email }, authConfig.jwtSecret, {
-        expiresIn: authConfig.jwtExpiresIn
-    });
+    // Generate JWT token including role
+    const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },  // ✅ Added `role`
+        authConfig.jwtSecret,
+        { expiresIn: authConfig.jwtExpiresIn }
+    );
 
     return { user, token };
 };
