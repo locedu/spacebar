@@ -1,6 +1,6 @@
 const prisma = require("../../../config/prismaClient");
 
-// Get a user by ID
+// Get a user by ID (Includes email)
 exports.getUserById = async (userId) => {
   return await prisma.user.findUnique({
     where: { id: userId },
@@ -8,6 +8,7 @@ exports.getUserById = async (userId) => {
       id: true,
       username: true,
       name: true,
+      email: true, // ✅ Added email
       statusMessage: true,
       role: true, // ✅ Include role for admin checks
     },
@@ -32,6 +33,7 @@ exports.searchUsers = async (query, filter = "username", limit = 10) => {
       id: true,
       username: true,
       name: true,
+      email: true, // ✅ Added email
     },
     take: limit,
   });
