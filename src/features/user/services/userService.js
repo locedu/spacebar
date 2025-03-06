@@ -4,11 +4,12 @@ exports.getUserById = async (userId) => {
     return await userModel.getUserById(userId);
 };
 
-exports.getUsersBySearch = async (searchTerm) => {
-    return await userModel.getUsersBySearch(searchTerm);
+// ✅ Updated to use `searchUsers`
+exports.searchUsers = async (searchTerm, filter = "username") => {
+    return await userModel.searchUsers(searchTerm, filter);
 };
 
-// ✅ Add this function if missing
+// ✅ Ensures consistency with the new model function
 exports.getAllUsers = async () => {
     return await userModel.getAllUsers();
 };
