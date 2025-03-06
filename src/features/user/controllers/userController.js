@@ -15,15 +15,17 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Search users by name or username (Live Search)
-exports.getUsersBySearch = async (req, res) => {
+// ✅ Updated to use `searchUsers` and accept a `filter` parameter
+exports.searchUsers = async (req, res) => {
   try {
     const searchTerm = req.query.q;
+    const filter = req.query.filter || "username"; // Default to username
+
     if (!searchTerm || searchTerm.trim() === "") {
       return res.status(400).json({ error: "Search term is required" });
     }
 
-    const users = await userService.getUsersBySearch(searchTerm);
+    const users = await userService.searchUsers(searchTerm, filter);
     res.status(200).json(users);
   } catch (error) {
     console.error("Error searching users:", error);
