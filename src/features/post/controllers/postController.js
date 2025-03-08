@@ -27,11 +27,13 @@ exports.getPost = async (req, res) => {
   }
 };
 
-// Get all posts
+// Get all posts (public + friends-only posts based on authenticated user)
 exports.getAllPosts = async (req, res) => {
+  const { user } = req; // Get the authenticated user's ID from the JWT
+
   try {
-    // const posts = await postService.getAllPosts();
-    const posts = await postService.getAllPosts();
+    // Pass userId to the service to handle friends-only filtering
+    const posts = await postService.getAllPosts(user.id);
     res.status(200).json(posts);
   } catch (error) {
     res.status(400).json({ error: error.message });

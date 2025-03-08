@@ -23,7 +23,12 @@ const getAllFriends = async (userId) => {
         },
       },
     },
-  }).then((result) => result.map((friendship) => friendship.friend)); // Flatten the result to return just the friend's data
+  }).then((result) => {
+    // Remove the authenticated user from the friends list
+    return result
+      .map((friendship) => friendship.friend)
+      .filter((friend) => friend.id !== userId);  // Filter out the authenticated user
+  });
 };
 
 // Function to add a friend for the current user

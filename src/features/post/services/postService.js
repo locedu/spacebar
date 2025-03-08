@@ -14,8 +14,10 @@ exports.getPost = async (postId) => {
   return await postModel.getPost(postId);
 };
 
-exports.getAllPosts = async () => {
-  return await postModel.getAllPosts();
+// Get all posts, including public and friend posts
+exports.getAllPosts = async (userId) => {
+  // Retrieve posts using the updated model method
+  return await postModel.getAllPosts(userId); // The model now handles combining both public and friend posts
 };
 
 exports.getAllPostsWithLikesCount = async () => {
