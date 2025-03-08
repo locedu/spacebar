@@ -23,7 +23,7 @@ const getAllFriends = async (userId) => {
         },
       },
     },
-  });
+  }).then((result) => result.map((friendship) => friendship.friend)); // Flatten the result to return just the friend's data
 };
 
 // Function to add a friend for the current user
@@ -64,8 +64,6 @@ const removeFriend = async (userId, friendId) => {
 
 // Function to get a specific friend (from either side of the relationship)
 const getFriend = async (userId, friendId) => {
-  console.log("Debugging - userId:", userId, "friendId:", friendId);  // Debugging line
-
   const friendship = await prisma.userFriends.findFirst({
     where: {
       OR: [
@@ -105,7 +103,6 @@ const getFriend = async (userId, friendId) => {
     // Return the correct friend details based on userId vs friendId
     return friendship.userId === userId ? friendship.friend : friendship.user;
   } else {
-    console.log("Friendship not found for userId:", userId, "and friendId:", friendId); // Debugging line
     return null;
   }
 };
