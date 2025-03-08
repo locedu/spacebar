@@ -39,9 +39,16 @@ exports.addFriendToCurrentUser = [authMiddleware, async (req, res) => {
 exports.removeFriendFromCurrentUser = [authMiddleware, async (req, res) => {
   const { friendId } = req.params;
   try {
-    await removeFriendFromCurrentUser(req.user.id, friendId);
+    const result = await removeFriendFromCurrentUser(req.user.id, friendId);
+    if (!result) {
+      // If no result is returned, that means no friendship was found
+      return res.status(404).json({ error: "User not on friends list" });
+    }
     res.status(200).json({ message: "Friend removed successfully" });
   } catch (error) {
+    if (error.message === 'Friendship does not exist') {
+      return res.status(404).json({ error: "User not on friends list" });
+    }
     console.error(error);
     res.status(500).json({ error: "Failed to remove friend" });
   }

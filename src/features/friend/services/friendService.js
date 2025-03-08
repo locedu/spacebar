@@ -19,7 +19,18 @@ exports.addFriendToCurrentUser = async (userId, friendId) => {
 
 // Remove a friend for the current authenticated user
 exports.removeFriendFromCurrentUser = async (userId, friendId) => {
-  return await modelFriend.removeFriend(userId, friendId);
+  try {
+    // Call the model to remove the friend
+    const result = await modelFriend.removeFriend(userId, friendId);
+    if (!result) {
+      // If no result (friendship doesn't exist), throw a meaningful error
+      throw new Error('User not on friends list');
+    }
+    return result; // Proceed with the removal if the friendship exists
+  } catch (error) {
+    // Propagate the error so it can be handled in the controller
+    throw error;
+  }
 };
 
 // Get all friends for a specific user (admin access or user access)

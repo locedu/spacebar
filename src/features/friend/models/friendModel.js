@@ -52,6 +52,21 @@ const addFriend = async (userId, friendId) => {
 
 // Function to remove a friend for the current user
 const removeFriend = async (userId, friendId) => {
+  // Check if the friendship exists
+  const friendship = await prisma.userFriends.findFirst({
+    where: {
+      OR: [
+        { userId: userId, friendId: friendId },
+        { userId: friendId, friendId: userId },
+      ],
+    },
+  });
+
+  if (!friendship) {
+    // If no friendship is found, throw an error with a meaningful message
+    throw new Error('Friendship does not exist');
+  }
+
   return await prisma.userFriends.deleteMany({
     where: {
       OR: [
@@ -72,18 +87,6 @@ const getFriend = async (userId, friendId) => {
       ],
     },
     include: {
-      user: {   // Only include the user's details
-        select: {
-          id: true,
-          username: true,
-          name: true,
-          status: true,
-          role: true,
-          createdAt: true,
-          updatedAt: true,
-          lastLogin: true,
-        },
-      },
       friend: {   // Only include the friend's details
         select: {
           id: true,
