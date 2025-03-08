@@ -10,7 +10,8 @@ const {
   postRoutes, 
   commentRoutes, 
   likeRoutes, 
-  userRoutes // ✅ Added User Routes
+  userRoutes,  // ✅ Added User Routes
+  friendRoutes // ✅ Added Friend Routes
 } = require("./features");
 
 const { 
@@ -27,7 +28,7 @@ app.use("/api/health/cors", healthCorsRoutes);
 app.use("/api/health/database/connect", healthDatabaseConnectRoutes);
 app.use("/api/health/database/migration", healthDatabaseMigrationRoutes);
 
-// auth (register, login, profile), post, comment
+// auth (register, login, profile), post, comment, friend
 app.use("/api/auth", registerRoutes);
 app.use("/api/auth", loginRoutes);
 app.use("/api/auth", profileRoutes);
@@ -35,6 +36,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/likes", likeRoutes);
 app.use("/api/users", userRoutes); // ✅ Registering User Routes
+app.use("/api/friends", friendRoutes); // ✅ Registering Friend Routes
 
 // Catch-all error handler (after all routes)
 app.use((err, req, res, next) => {

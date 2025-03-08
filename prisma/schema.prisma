@@ -4,6 +4,8 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// This is your Prisma schema file
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -47,6 +49,8 @@ model User {
   posts          Post[]    // Posts created by the user
   comments       Comment[] // Comments made by the user
   likes          Like[]    // Posts liked by the user
+  friends        UserFriends[] @relation("UserFriendsUser") // User's friend relationships (self-referencing through UserFriends)
+  friendsOf      UserFriends[] @relation("UserFriendsFriend") // Reverse relation for friends (friend side)
 }
 
 model Post {
@@ -87,4 +91,21 @@ model Like {
   post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId]) // Ensure a user can only like a post once
+}
+
+model UserFriends {
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+
+  // Index both userId and friendId for faster lookup
+  @@index([userId])
+  @@index([friendId])
+
+  // Ensure that each user can only be friends with another user once
+  @@unique([userId, friendId])
+
+  // Relationship to the User model (user and friend have different relation names)
+  user     User    @relation("UserFriendsUser", fields: [userId], references: [id], onDelete: Cascade)
+  friend   User    @relation("UserFriendsFriend", fields: [friendId], references: [id], onDelete: Cascade)
 }
