@@ -10,8 +10,18 @@ const getAllFriends = async (userId) => {
       ],
     },
     include: {
-      user: true,   // Include the user data for the first user in the relationship
-      friend: true, // Include the user data for the second user (the friend)
+      friend: {   // Only include the friend's details
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          status: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+          lastLogin: true,
+        },
+      },
     },
   });
 };
@@ -23,17 +33,15 @@ const addFriend = async (userId, friendId) => {
     where: {
       OR: [
         { userId: userId, friendId: friendId },
-        { userId: friendId, friendId: userId }
-      ]
-    }
+        { userId: friendId, friendId: userId },
+      ],
+    },
   });
 
-  // If friendship already exists, return a message instead of adding
   if (existingFriendship) {
     throw new Error('Friendship already exists');
   }
 
-  // If no friendship exists, create a new one
   return await prisma.userFriends.create({
     data: {
       userId: userId,
@@ -56,7 +64,9 @@ const removeFriend = async (userId, friendId) => {
 
 // Function to get a specific friend (from either side of the relationship)
 const getFriend = async (userId, friendId) => {
-  return await prisma.userFriends.findFirst({
+  console.log("Debugging - userId:", userId, "friendId:", friendId);  // Debugging line
+
+  const friendship = await prisma.userFriends.findFirst({
     where: {
       OR: [
         { userId: userId, friendId: friendId },
@@ -64,10 +74,40 @@ const getFriend = async (userId, friendId) => {
       ],
     },
     include: {
-      user: true,
-      friend: true,
+      user: {   // Only include the user's details
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          status: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+          lastLogin: true,
+        },
+      },
+      friend: {   // Only include the friend's details
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          status: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+          lastLogin: true,
+        },
+      },
     },
   });
+
+  if (friendship) {
+    // Return the correct friend details based on userId vs friendId
+    return friendship.userId === userId ? friendship.friend : friendship.user;
+  } else {
+    console.log("Friendship not found for userId:", userId, "and friendId:", friendId); // Debugging line
+    return null;
+  }
 };
 
 // Export functions for use in the service layer
