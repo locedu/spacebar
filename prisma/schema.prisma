@@ -15,7 +15,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// models
+// Enums
 
 enum UserStatus {
   ACTIVE
@@ -29,42 +29,50 @@ enum UserRole {
   MODERATOR
 }
 
+enum PostVisibility {
+  public
+  friends
+}
+
+// Models
+
 model User {
-  id             String    @id @default(uuid()) // UUID as the primary key
-  username       String    @unique
-  email          String    @unique
-  password       String    // Required for authentication
-  name           String    @default("Anonymous") // Default value "Anonymous"
-  status         UserStatus @default(ACTIVE) // System status (e.g., "active", "blocked")
-  statusMessage  String?   // Optional field for a one-liner user status (e.g., "Feeling good today")
-  profileImage   String?   // Optional field for profile image URL
-  bio            String?   // Optional field for user bio (description)
+  id             String          @id @default(uuid()) // UUID as the primary key
+  username       String          @unique
+  email          String          @unique
+  password       String          // Required for authentication
+  name           String          @default("Anonymous") // Default value "Anonymous"
+  status         UserStatus      @default(ACTIVE) // System status (e.g., "active", "blocked")
+  statusMessage  String?         // Optional field for a one-liner user status (e.g., "Feeling good today")
+  profileImage   String?         // Optional field for profile image URL
+  bio            String?         // Optional field for user bio (description)
 
-  role           UserRole @default(USER) // User role (e.g., USER, ADMIN)
+  role           UserRole        @default(USER) // User role (e.g., USER, ADMIN)
 
-  createdAt      DateTime  @default(now()) // Automatically set when the account is created
-  updatedAt      DateTime  @updatedAt // Automatically updated when the user record is updated
-  lastLogin      DateTime? // Nullable field for tracking last login time
+  createdAt      DateTime        @default(now()) // Automatically set when the account is created
+  updatedAt      DateTime        @updatedAt // Automatically updated when the user record is updated
+  lastLogin      DateTime?       // Nullable field for tracking last login time
 
-  posts          Post[]    // Posts created by the user
-  comments       Comment[] // Comments made by the user
-  likes          Like[]    // Posts liked by the user
-  friends        UserFriends[] @relation("UserFriendsUser") // User's friend relationships (self-referencing through UserFriends)
-  friendsOf      UserFriends[] @relation("UserFriendsFriend") // Reverse relation for friends (friend side)
+  posts          Post[]          // Posts created by the user
+  comments       Comment[]       // Comments made by the user
+  likes          Like[]          // Posts liked by the user
+  friends        UserFriends[]   @relation("UserFriendsUser") // User's friend relationships (self-referencing through UserFriends)
+  friendsOf      UserFriends[]   @relation("UserFriendsFriend") // Reverse relation for friends (friend side)
 }
 
 model Post {
-  id        String    @id @default(uuid()) // UUID as the primary key
-  title     String    // Title of the post
-  content   String    // Content of the post
-  createdAt DateTime  @default(now()) // Automatically set when the post is created
-  updatedAt DateTime  @updatedAt // Automatically updated when the post is modified
-  userId    String    // Reference to the user who created the post (UUID)
+  id        String          @id @default(uuid()) // UUID as the primary key
+  title     String          // Title of the post
+  content   String          // Content of the post
+  visibility PostVisibility @default(public) // Post visibility (public or friends)
+  createdAt DateTime        @default(now()) // Automatically set when the post is created
+  updatedAt DateTime        @updatedAt // Automatically updated when the post is modified
+  userId    String          // Reference to the user who created the post (UUID)
 
   // CASCADE delete on the related entity (User -> Post)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comments  Comment[] // Comments associated with the post
-  likes     Like[]    // Likes on the post
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  Comment[]       // Comments associated with the post
+  likes     Like[]          // Likes on the post
 }
 
 model Comment {
