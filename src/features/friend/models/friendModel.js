@@ -28,6 +28,21 @@ const getAllFriends = async (userId) => {
 
 // Function to add a friend for the current user
 const addFriend = async (userId, friendId) => {
+  // Check if the current user exists
+  const userExists = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  // Check if the friend exists
+  const friendExists = await prisma.user.findUnique({
+    where: { id: friendId },
+  });
+
+  // If either user doesn't exist, throw an error
+  if (!userExists || !friendExists) {
+    throw new Error('One or both users do not exist');
+  }
+
   // Check if the friendship already exists
   const existingFriendship = await prisma.userFriends.findFirst({
     where: {
@@ -42,6 +57,7 @@ const addFriend = async (userId, friendId) => {
     throw new Error('Friendship already exists');
   }
 
+  // Create the friendship
   return await prisma.userFriends.create({
     data: {
       userId: userId,
