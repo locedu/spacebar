@@ -2,30 +2,30 @@ const prisma = require("../../../config/prismaClient");
 
 // Function to get all friends of a user (current user or any other user)
 const getAllFriends = async (userId) => {
-  // Search for userId in both directions (userId and friendId)
-  const friends = await prisma.userFriends.findMany({
-    where: {
-      OR: [
-        { userId: userId },   // Look for rows where the user is the "userId"
-        { friendId: userId }, // Look for rows where the user is the "friendId"
-      ],
-    },
-    select: {
-      userId: true,
-      friendId: true,
-    },
+  // Step 1: Retrieve all friendships where the user is the "userId"
+  const friendsAsUser = await prisma.userFriends.findMany({
+    where: { userId: userId },
+    select: { friendId: true },
   });
 
-  // Extract the friend IDs (exclude the authenticated user from the result)
-  const friendIds = friends.map(friendship => 
-    friendship.userId === userId ? friendship.friendId : friendship.userId
-  ).filter(id => id !== userId); // Remove the authenticated user from the list of friends
+  // Step 2: Retrieve all friendships where the user is the "friendId"
+  const friendsAsFriend = await prisma.userFriends.findMany({
+    where: { friendId: userId },
+    select: { userId: true },
+  });
 
-  // Now fetch the full details for each friend using the extracted friendIds
+  // Combine both lists of friend ids, removing duplicates
+  const friendIds = [
+    ...friendsAsUser.map((friend) => friend.friendId),
+    ...friendsAsFriend.map((friend) => friend.userId),
+  ];
+
+  // Filter duplicates by converting to a Set, then back to an array
+  const uniqueFriendIds = [...new Set(friendIds)];
+
+  // Step 3: Retrieve friend details based on the unique friend ids
   const friendDetails = await prisma.user.findMany({
-    where: {
-      id: { in: friendIds }, // Only fetch friends whose IDs match the list of friendIds
-    },
+    where: { id: { in: uniqueFriendIds } },
     select: {
       id: true,
       username: true,
@@ -56,7 +56,7 @@ const addFriend = async (userId, friendId) => {
 
   // If either user doesn't exist, throw an error
   if (!userExists || !friendExists) {
-    throw new Error('One or both users do not exist');
+    throw new Error("One or both users do not exist");
   }
 
   // Check if the friendship already exists
@@ -70,7 +70,7 @@ const addFriend = async (userId, friendId) => {
   });
 
   if (existingFriendship) {
-    throw new Error('Friendship already exists');
+    throw new Error("Friendship already exists");
   }
 
   // Create the friendship
@@ -96,7 +96,7 @@ const removeFriend = async (userId, friendId) => {
 
   if (!friendship) {
     // If no friendship is found, throw an error with a meaningful message
-    throw new Error('Friendship does not exist');
+    throw new Error("Friendship does not exist");
   }
 
   return await prisma.userFriends.deleteMany({
@@ -119,7 +119,7 @@ const getFriend = async (userId, friendId) => {
       ],
     },
     include: {
-      friend: {   // Only include the friend's details
+      friend: {
         select: {
           id: true,
           username: true,
