@@ -1,6 +1,15 @@
 const prisma = require("../../../config/prismaClient");
 const notificationModel = require("../../notification/models/notificationModel"); // Import notification model
 
+// Constants for notification type
+const NOTIFICATION_TYPES = {
+  POST: 'POST',
+  COMMENT: 'COMMENT',
+  LIKE: 'LIKE',
+  FRIEND: 'FRIEND',
+  UN_FRIEND: 'UN_FRIEND',
+};
+
 // Create a new post
 exports.createPost = async (postData) => {
   // Step 1: Create the post
@@ -31,9 +40,8 @@ exports.createPost = async (postData) => {
     // Step 2.2: Create a notification for each friend
     const notifications = friendIds.map(friendId => ({
       userId: friendId,         // Friend's user ID
-      type: 'post',              // Notification type
       targetId: post.id,        // ID of the post being notified about
-      targetType: 'post',       // Type of the target (in this case 'post')
+      targetType: NOTIFICATION_TYPES.POST, // Use constant for type
       createdAt: new Date(),
     }));
 
