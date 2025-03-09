@@ -1,9 +1,25 @@
 const prisma = require("../../../config/prismaClient");
 
+// Constants for notification types
+const NOTIFICATION_TYPES = {
+  POST: 'POST',
+  COMMENT: 'COMMENT',
+  LIKE: 'LIKE',
+  FRIEND: 'FRIEND',
+  UN_FRIEND: 'UN_FRIEND',
+};
+
 // Create a new notification
 exports.createNotification = async (notificationData) => {
   return await prisma.notification.create({
     data: notificationData,
+  });
+};
+
+// Create multiple notifications at once
+exports.createNotifications = async (notificationsData) => {
+  return await prisma.notification.createMany({
+    data: notificationsData, // Bulk insert notifications
   });
 };
 
@@ -28,10 +44,10 @@ exports.createNotificationsForFriends = async (postId, userId) => {
   
   // Step 3: Create notifications for each friend
   const notifications = friendIds.map(friendId => ({
-    userId: friendId,  // Notify the friend
-    type: 'post',       // Type of notification (post)
-    targetId: postId,   // ID of the post
-    targetType: 'post', // Specify the type of the target
+    userId: friendId,         // Notify the friend
+    targetType: NOTIFICATION_TYPES.POST, // Use constant for type
+    targetId: postId,         // ID of the post being notified about
+    createdAt: new Date(),    // Set creation time if needed
   }));
 
   // Step 4: Create multiple notifications at once using Prisma's `createMany`
