@@ -2,33 +2,44 @@ const prisma = require("../../../config/prismaClient");
 
 // Function to get all friends of a user (current user or any other user)
 const getAllFriends = async (userId) => {
-  return await prisma.userFriends.findMany({
+  // Search for userId in both directions (userId and friendId)
+  const friends = await prisma.userFriends.findMany({
     where: {
       OR: [
-        { userId: userId },  // Friends where the user is the first one
-        { friendId: userId }, // Friends where the user is the second one (the friend)
+        { userId: userId },   // Look for rows where the user is the "userId"
+        { friendId: userId }, // Look for rows where the user is the "friendId"
       ],
     },
-    include: {
-      friend: {   // Only include the friend's details
-        select: {
-          id: true,
-          username: true,
-          name: true,
-          status: true,
-          role: true,
-          createdAt: true,
-          updatedAt: true,
-          lastLogin: true,
-        },
-      },
+    select: {
+      userId: true,
+      friendId: true,
     },
-  }).then((result) => {
-    // Remove the authenticated user from the friends list
-    return result
-      .map((friendship) => friendship.friend)
-      .filter((friend) => friend.id !== userId);  // Filter out the authenticated user
   });
+
+  // Extract the friend IDs (exclude the authenticated user from the result)
+  const friendIds = friends.map(friendship => 
+    friendship.userId === userId ? friendship.friendId : friendship.userId
+  ).filter(id => id !== userId); // Remove the authenticated user from the list of friends
+
+  // Now fetch the full details for each friend using the extracted friendIds
+  const friendDetails = await prisma.user.findMany({
+    where: {
+      id: { in: friendIds }, // Only fetch friends whose IDs match the list of friendIds
+    },
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      status: true,
+      role: true,
+      createdAt: true,
+      updatedAt: true,
+      lastLogin: true,
+    },
+  });
+
+  // Return the complete details of the friends
+  return friendDetails;
 };
 
 // Function to add a friend for the current user
