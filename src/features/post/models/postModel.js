@@ -1,10 +1,47 @@
 const prisma = require("../../../config/prismaClient");
+const notificationModel = require("../../notification/models/notificationModel"); // Import notification model
 
 // Create a new post
 exports.createPost = async (postData) => {
-  return await prisma.post.create({
+  // Step 1: Create the post
+  const post = await prisma.post.create({
     data: postData,
   });
+
+  // Step 2: If post visibility is 'friends', create notifications for friends
+  if (post.visibility === "friends") {
+    // Step 2.1: Fetch friends of the user (excluding the user who created the post)
+    const friends = await prisma.userFriends.findMany({
+      where: {
+        OR: [
+          { userId: post.userId },
+          { friendId: post.userId }
+        ],
+      },
+      select: {
+        userId: true,
+        friendId: true
+      },
+    });
+
+    const friendIds = friends
+      .map(f => (f.userId === post.userId ? f.friendId : f.userId)) // Collect friend IDs
+      .filter(friendId => friendId !== post.userId); // Exclude the post creator
+
+    // Step 2.2: Create a notification for each friend
+    const notifications = friendIds.map(friendId => ({
+      userId: friendId,         // Friend's user ID
+      type: 'post',              // Notification type
+      targetId: post.id,        // ID of the post being notified about
+      targetType: 'post',       // Type of the target (in this case 'post')
+      createdAt: new Date(),
+    }));
+
+    // Step 2.3: Create notifications for each friend
+    await notificationModel.createNotifications(notifications);  // Using the correct method for creating multiple notifications
+  }
+
+  return post;
 };
 
 // Get a single post by ID
