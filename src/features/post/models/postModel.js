@@ -53,40 +53,45 @@ exports.getAllPosts = async (userId) => {
     },
   }).then(posts => posts.map(post => ({ ...post, friendLabel: 'public' }))); // Label public posts as "public"
 
-  // Step 2: Retrieve all non-public posts (friends-only posts) and store in List B
+  // Step 2: Get the list of friend IDs for the authenticated user
+  let friendIds = await prisma.userFriends.findMany({
+    where: {
+      OR: [
+        { userId: userId },  // When the authenticated user is the "userId"
+        { friendId: userId }, // When the authenticated user is the "friendId"
+      ],
+    },
+    select: {
+      userId: true,
+      friendId: true,
+    },
+  }).then((friends) => {
+    return friends.map((f) => (f.userId === userId ? f.friendId : f.userId));
+  });
+
+  // Step 3: Automatically add the authenticated user's ID to the friend list to allow visibility to their own posts
+  friendIds.push(userId); // This ensures the user can see their own posts
+
+  // Step 4: Retrieve all friends' posts and filter based on friend relationships
   const friendPosts = await prisma.post.findMany({
     where: {
       visibility: 'friends',
+      userId: { in: friendIds },  // Filter posts by friend IDs
     },
     include: {
       user: {
         select: {
           name: true,
-          id: true, // Include the author's userId for comparison
+          id: true,
         },
       },
       comments: true,
       likes: true,
     },
-  }).then(posts => posts.map(post => ({
-    ...post,
-    friendLabel: 'not visible' // Default value for friend posts (we'll check if the user is a friend below)
-  })));
+  }).then(posts => posts.map(post => ({ ...post, friendLabel: "friend's post" }))); // Label friend posts as "friend's post"
 
-  // Step 3: Filter List B based on whether the authenticated user is a friend of the author
-  const friendPostsFiltered = await Promise.all(friendPosts.map(async post => {
-    const isFriendOfAuthor = await isFriend(userId, post.userId);
-    if (isFriendOfAuthor) {
-      post.friendLabel = "friend's post"; // Label as "friend's post" if the post's author is a friend
-    }
-    return isFriendOfAuthor ? post : null; // Only include the post if the user is a friend
-  }));
-
-  // Step 4: Filter out any null entries (non-friend posts) from List C
-  const friendPostsOnly = friendPostsFiltered.filter(post => post !== null);
-
-  // Step 5: Combine List A and List C (public posts + friend posts) and return
-  return [...publicPosts, ...friendPostsOnly];
+  // Step 5: Combine List A (public posts) and List C (friends' posts) and return
+  return [...publicPosts, ...friendPosts];
 };
 
 exports.getAllPostsWithLikesCount = async () => {
