@@ -26,36 +26,17 @@ exports.createComment = async (commentData) => {
     },
   });
 
-  // Step 3: If the post visibility is 'friends', create notifications for friends
-  if (post.visibility === "friends") {
-    // Step 3.1: Fetch friends of the post's author (excluding the author)
-    const friends = await prisma.userFriends.findMany({
-      where: {
-        OR: [
-          { userId: post.userId },  // When the authenticated user is the "userId"
-          { friendId: post.userId }, // When the authenticated user is the "friendId"
-        ],
-      },
-      select: {
-        userId: true,
-        friendId: true,
-      },
-    });
+  // Step 3: Create notification for the author of the post (only)
+  if (post.userId !== commentData.userId) {  // Ensure the comment author doesn't get a notification
+    const notification = {
+      userId: post.userId,         // The author of the post
+      targetType: NOTIFICATION_TYPES.COMMENT, // Notification type: COMMENT
+      targetId: comment.id,        // ID of the comment being notified about
+      createdAt: new Date(),
+    };
 
-    // Step 3.2: Extract friend IDs and ensure the user is not included
-    const friendIds = friends.map(f => (f.userId === post.userId ? f.friendId : f.userId))
-      .filter(friendId => friendId !== post.userId); // Exclude the post creator
-
-    // Step 3.3: Create notifications for each friend about the new comment
-    const notifications = friendIds.map(friendId => ({
-      userId: friendId,         // Notify the friend
-      targetType: NOTIFICATION_TYPES.COMMENT, // Use constant for type
-      targetId: comment.id,     // ID of the comment being notified about
-      createdAt: new Date(),    // Set creation time if needed
-    }));
-
-    // Step 3.4: Create multiple notifications at once using Prisma's `createMany`
-    await notificationModel.createNotifications(notifications);  // Reuse the method to create multiple notifications
+    // Step 4: Create the notification for the post owner
+    await notificationModel.createNotification(notification);  // Create notification for the post owner
   }
 
   return comment;
