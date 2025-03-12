@@ -1,4 +1,14 @@
 const prisma = require("../../../config/prismaClient");
+const notificationModel = require("../../notification/models/notificationModel"); // Import notification model
+
+// Constants for notification types
+const NOTIFICATION_TYPES = {
+  POST: 'POST',
+  COMMENT: 'COMMENT',
+  LIKE: 'LIKE',
+  FRIEND: 'FRIEND',
+  UN_FRIEND: 'UN_FRIEND',
+};
 
 // Function to get all friends of a user (current user or any other user)
 const getAllFriends = async (userId) => {
@@ -74,12 +84,25 @@ const addFriend = async (userId, friendId) => {
   }
 
   // Create the friendship
-  return await prisma.userFriends.create({
+  const friendship = await prisma.userFriends.create({
     data: {
       userId: userId,
       friendId: friendId,
     },
   });
+
+  // Step 1: Create a notification for the target user (the friend being added)
+  const notification = {
+    userId: friendId,          // The target user is the one being added
+    targetType: NOTIFICATION_TYPES.FRIEND,  // Notification type: FRIEND
+    targetId: friendship.userId,   // Ensure we're using the correct targetId (userId of the friendship)
+    createdAt: new Date(),
+  };
+
+  // Step 2: Create the notification
+  await notificationModel.createNotification(notification);
+
+  return friendship;
 };
 
 // Function to remove a friend for the current user
