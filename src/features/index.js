@@ -6,7 +6,8 @@ const commentRoutes = require("./comment/routes/commentRoutes");
 const likeRoutes = require("./like/routes/likeRoutes");
 const userRoutes = require("./user/routes/userRoutes");
 const friendRoutes = require("./friend/routes/friendRoutes"); 
-const notificationRoutes = require("./notification/routes/notificationRoutes"); // ✅ Added Notification Routes
+const notificationRoutes = require("./notification/routes/notificationRoutes"); 
+const activityRoutes = require("./activity/routes/activityRoutes"); // Added Activity Routes
 
 module.exports = { 
     registerRoutes, 
@@ -17,5 +18,6 @@ module.exports = {
     likeRoutes, 
     userRoutes, 
     friendRoutes, 
-    notificationRoutes // ✅ Exporting Notification Routes
+    notificationRoutes,
+    activityRoutes // Exporting Activity Routes
 };

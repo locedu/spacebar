@@ -18,6 +18,8 @@ URL: https://spacebar-express.onrender.com/
 - stretch goals.. ??
 
 ## completions
+- last login, edit profile backend routes
+- (many not listed here, see frontend)
 - updated getAllComments (returns user id, name)
 - - route (like)
 - routes (post, comment)

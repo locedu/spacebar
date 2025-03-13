@@ -1,8 +1,18 @@
 const prisma = require("../../../config/prismaClient");
 const notificationModel = require("../../notification/models/notificationModel"); // Import notification model
+const activityModel = require("../../activity/models/activityModel"); // Import activity model
 
 // Constants for notification types
 const NOTIFICATION_TYPES = {
+  POST: 'POST',
+  COMMENT: 'COMMENT',
+  LIKE: 'LIKE',
+  FRIEND: 'FRIEND',
+  UN_FRIEND: 'UN_FRIEND',
+};
+
+// Constants for activity types
+const ACTIVITY_TYPES = {
   POST: 'POST',
   COMMENT: 'COMMENT',
   LIKE: 'LIKE',
@@ -102,6 +112,14 @@ const addFriend = async (userId, friendId) => {
   // Step 2: Create the notification
   await notificationModel.createNotification(notification);
 
+  // Step 3: Log the friend added activity
+  await activityModel.createActivity({
+    userId: userId,
+    targetType: ACTIVITY_TYPES.FRIEND,  // Activity type for adding a friend
+    targetId: friendId,    // Target ID will be the friend's ID
+    createdAt: new Date(),  // Capture the time of the activity
+  });
+
   return friendship;
 };
 
@@ -122,7 +140,8 @@ const removeFriend = async (userId, friendId) => {
     throw new Error("Friendship does not exist");
   }
 
-  return await prisma.userFriends.deleteMany({
+  // Remove the friendship from the database
+  const removedFriendship = await prisma.userFriends.deleteMany({
     where: {
       OR: [
         { userId: userId, friendId: friendId },
@@ -130,6 +149,16 @@ const removeFriend = async (userId, friendId) => {
       ],
     },
   });
+
+  // Step 4: Log the friend removal activity
+  await activityModel.createActivity({
+    userId: userId,
+    targetType: ACTIVITY_TYPES.UN_FRIEND,  // Activity type for un-friending
+    targetId: friendId,       // Target ID will be the friend's ID
+    createdAt: new Date(),     // Capture the time of the activity
+  });
+
+  return removedFriendship;
 };
 
 // Function to get a specific friend (from either side of the relationship)

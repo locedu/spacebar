@@ -59,7 +59,9 @@ model User {
   friends        UserFriends[]   @relation("UserFriendsUser") // User's friend relationships (self-referencing through UserFriends)
   friendsOf      UserFriends[]   @relation("UserFriendsFriend") // Reverse relation for friends (friend side)
   notifications  Notification[]  // User's notifications
+  activities     Activity[]      // User's activities (new relation)
 }
+
 
 model Post {
   id        String          @id @default(uuid()) // UUID as the primary key
@@ -124,3 +126,27 @@ model Notification {
 
   user        User            @relation(fields: [userId], references: [id])
 }
+
+
+// Enums
+enum ActivityType {
+  POST
+  COMMENT
+  LIKE
+  FRIEND
+  UN_FRIEND
+  LOGIN  // Add LOGIN to the enum
+}
+
+// Models
+model Activity {
+  id          String       @id @default(uuid())
+  userId      String
+  targetType  ActivityType // Reference to the ActivityType enum
+  targetId    String
+  createdAt   DateTime     @default(now())
+  user        User         @relation(fields: [userId], references: [id])
+}
+
+
+

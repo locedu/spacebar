@@ -1,5 +1,6 @@
 const prisma = require("../../../config/prismaClient");
 const notificationModel = require("../../notification/models/notificationModel"); // Import notification model
+const activityModel = require("../../activity/models/activityModel"); // Import activity model
 
 // Constants for notification types
 const NOTIFICATION_TYPES = {
@@ -38,6 +39,14 @@ exports.likePost = async (likeData) => {
     // Step 4: Create the notification for the post owner
     await notificationModel.createNotification(notification);  // Create notification for the post owner
   }
+
+  // Step 5: Log the like activity in Activity table
+  await activityModel.createActivity({
+    userId: likeData.userId, // The user who liked the post
+    targetType: 'LIKE',      // Activity type
+    targetId: like.id,       // Like ID
+    createdAt: new Date(),   // Capture the time of the like
+  });
 
   return like;
 };
