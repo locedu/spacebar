@@ -8,6 +8,7 @@ exports.updateProfile = async (userId, profileData) => {
         name: profileData.name,
         statusMessage: profileData.statusMessage,
         bio: profileData.bio,
+        lastLogin: profileData.lastLogin, // If passed, update lastLogin as well
       },
     });
     return updatedUser;
