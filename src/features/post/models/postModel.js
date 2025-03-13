@@ -1,8 +1,18 @@
 const prisma = require("../../../config/prismaClient");
 const notificationModel = require("../../notification/models/notificationModel"); // Import notification model
+const activityModel = require("../../activity/models/activityModel"); // Import activity model
 
 // Constants for notification type
 const NOTIFICATION_TYPES = {
+  POST: 'POST',
+  COMMENT: 'COMMENT',
+  LIKE: 'LIKE',
+  FRIEND: 'FRIEND',
+  UN_FRIEND: 'UN_FRIEND',
+};
+
+// Constants for activity type
+const ACTIVITY_TYPES = {
   POST: 'POST',
   COMMENT: 'COMMENT',
   LIKE: 'LIKE',
@@ -48,6 +58,14 @@ exports.createPost = async (postData) => {
     // Step 2.3: Create notifications for each friend
     await notificationModel.createNotifications(notifications);  // Using the correct method for creating multiple notifications
   }
+
+  // Step 3: Log the post activity in Activity table
+  await activityModel.createActivity({
+    userId: post.userId,
+    targetType: ACTIVITY_TYPES.POST,  // Activity type
+    targetId: post.id,  // Post ID
+    createdAt: new Date(), // Ensure timestamp is captured
+  });
 
   return post;
 };

@@ -1,5 +1,6 @@
 const prisma = require("../../../config/prismaClient");
 const notificationModel = require("../../notification/models/notificationModel"); // Import notification model
+const activityModel = require("../../activity/models/activityModel"); // Import activity model
 
 // Constants for notification types
 const NOTIFICATION_TYPES = {
@@ -38,6 +39,14 @@ exports.createComment = async (commentData) => {
     // Step 4: Create the notification for the post owner
     await notificationModel.createNotification(notification);  // Create notification for the post owner
   }
+
+  // Step 5: Log the comment activity in Activity table
+  await activityModel.createActivity({
+    userId: commentData.userId, // The user who made the comment
+    targetType: 'COMMENT',      // Activity type
+    targetId: comment.id,       // Comment ID
+    createdAt: new Date(),      // Capture the time of the comment
+  });
 
   return comment;
 };
