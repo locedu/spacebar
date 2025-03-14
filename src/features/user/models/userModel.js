@@ -1,6 +1,6 @@
 const prisma = require("../../../config/prismaClient");
 
-// Get a user by ID (Includes email)
+// Get a user by ID (Includes bio, lastLogin, lastUpdated)
 exports.getUserById = async (userId) => {
   return await prisma.user.findUnique({
     where: { id: userId },
@@ -8,9 +8,12 @@ exports.getUserById = async (userId) => {
       id: true,
       username: true,
       name: true,
-      email: true, // ✅ Added email
+      email: true,
       statusMessage: true,
-      role: true, // ✅ Include role for admin checks
+      bio: true, // ✅ Added bio
+      lastLogin: true, // ✅ Added last login timestamp
+      updatedAt: true, // ✅ Prisma automatically tracks updates
+      role: true,
     },
   });
 };
@@ -33,13 +36,13 @@ exports.searchUsers = async (query, filter = "username", limit = 10) => {
       id: true,
       username: true,
       name: true,
-      email: true, // ✅ Added email
+      email: true,
     },
     take: limit,
   });
 };
 
-// Get all users (Unchanged)
+// Get all users (Includes bio, lastLogin, lastUpdated)
 exports.getAllUsers = async () => {
   return await prisma.user.findMany({
     select: {
@@ -47,7 +50,10 @@ exports.getAllUsers = async () => {
       username: true,
       email: true,
       name: true,
-      role: true, // ✅ Required for checking admin users
+      bio: true, // ✅ Added bio
+      lastLogin: true, // ✅ Added last login timestamp
+      updatedAt: true, // ✅ Prisma tracks last update automatically
+      role: true,
     },
   });
 };
