@@ -10,19 +10,27 @@ exports.findUserById = async (userId) => {
   }
 };
 
-exports.updateProfile = async (userId, profileData) => {
+exports.updateProfile = async (userId, profileData, isAdmin) => {
   try {
+    // Prepare the update data
+    let updateData = {
+      name: profileData.name,
+      statusMessage: profileData.statusMessage,
+      bio: profileData.bio,
+      profileImage: profileData.profileImage,
+      lastLogin: profileData.lastLogin, // ✅ If passed, update lastLogin as well
+    };
+
+    // ✅ Only allow admins to update 'status', and only for other users
+    if (isAdmin && profileData.status) {
+      updateData.status = profileData.status;
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: {
-        name: profileData.name,
-        statusMessage: profileData.statusMessage,
-        bio: profileData.bio,
-        profileImage: profileData.profileImage, // ✅ Include profile image
-        lastLogin: profileData.lastLogin, // ✅ If passed, update lastLogin as well
-        status: profileData.status, // ✅ Allow updating user status
-      },
+      data: updateData,
     });
+
     return updatedUser;
   } catch (error) {
     throw new Error("Error updating profile");

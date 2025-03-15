@@ -33,7 +33,7 @@ app.use("/api/health/database/migration", healthDatabaseMigrationRoutes);
 // auth (register, login, profile), post, comment, friend, notifications, activity
 app.use("/api/auth", registerRoutes);
 app.use("/api/auth", loginRoutes);
-app.use("/api/auth", profileRoutes);
+app.use("/api/profiles", profileRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/likes", likeRoutes);
