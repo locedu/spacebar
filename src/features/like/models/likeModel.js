@@ -44,7 +44,7 @@ exports.likePost = async (likeData) => {
   await activityModel.createActivity({
     userId: likeData.userId, // The user who liked the post
     targetType: 'LIKE',      // Activity type
-    targetId: like.id,       // Like ID
+    targetId: likeData.postId,
     createdAt: new Date(),   // Capture the time of the like
   });
 
