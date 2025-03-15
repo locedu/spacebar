@@ -8,6 +8,8 @@ exports.getUserById = async (userId) => {
       id: true,
       username: true,
       name: true,
+      status: true,
+      profileImage: true,
       email: true,
       statusMessage: true,
       bio: true, // ✅ Added bio
