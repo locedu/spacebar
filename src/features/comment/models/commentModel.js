@@ -40,13 +40,13 @@ exports.createComment = async (commentData) => {
     await notificationModel.createNotification(notification);  // Create notification for the post owner
   }
 
-  // Step 5: Log the comment activity in Activity table
-  await activityModel.createActivity({
-    userId: commentData.userId, // The user who made the comment
-    targetType: 'COMMENT',      // Activity type
-    targetId: comment.id,       // Comment ID
-    createdAt: new Date(),      // Capture the time of the comment
-  });
+// Step 5: Log the comment activity in Activity table with postId instead of commentId
+await activityModel.createActivity({
+  userId: commentData.userId, // The user who made the comment
+  targetType: 'COMMENT',      // Activity type
+  targetId: commentData.postId, // Store postId instead of commentId
+  createdAt: new Date(),      // Capture the time of the comment
+});
 
   return comment;
 };
