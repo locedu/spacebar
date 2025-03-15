@@ -1,5 +1,15 @@
 const prisma = require("../../../config/prismaClient");
 
+exports.findUserById = async (userId) => {
+  try {
+    return await prisma.user.findUnique({
+      where: { id: userId },
+    });
+  } catch (error) {
+    throw new Error("Error fetching user profile");
+  }
+};
+
 exports.updateProfile = async (userId, profileData) => {
   try {
     const updatedUser = await prisma.user.update({
@@ -8,7 +18,9 @@ exports.updateProfile = async (userId, profileData) => {
         name: profileData.name,
         statusMessage: profileData.statusMessage,
         bio: profileData.bio,
-        lastLogin: profileData.lastLogin, // If passed, update lastLogin as well
+        profileImage: profileData.profileImage, // ✅ Include profile image
+        lastLogin: profileData.lastLogin, // ✅ If passed, update lastLogin as well
+        status: profileData.status, // ✅ Allow updating user status
       },
     });
     return updatedUser;
