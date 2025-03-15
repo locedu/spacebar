@@ -4,6 +4,7 @@ exports.getProfileById = async (userId) => {
     return await profileModel.findUserById(userId);
 };
 
-exports.updateUserProfile = async (userId, profileData) => {
-    return await profileModel.updateProfile(userId, profileData);
+exports.updateUserProfile = async (requestingUser, userId, profileData) => {
+    const isAdmin = requestingUser.role === 'ADMIN' && requestingUser.id !== userId; // ✅ Ensure admins can't update themselves
+    return await profileModel.updateProfile(userId, profileData, isAdmin);
 };

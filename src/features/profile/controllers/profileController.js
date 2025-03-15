@@ -16,7 +16,7 @@ exports.getOwnProfile = async (req, res) => {
 // ✅ Update the logged-in user's profile
 exports.updateOwnProfile = async (req, res) => {
     try {
-        const updatedUser = await profileService.updateUserProfile(req.user.id, req.body);
+        const updatedUser = await profileService.updateUserProfile(req.user, req.user.id, req.body);
         res.status(200).json({ message: "Profile updated successfully", updatedUser });
     } catch (error) {
         res.status(500).json({ error: 'Failed to update profile' });
@@ -47,7 +47,7 @@ exports.updateProfile = async (req, res) => {
             return res.status(403).json({ error: "Unauthorized to update this profile" });
         }
 
-        const updatedUser = await profileService.updateUserProfile(userId, req.body);
+        const updatedUser = await profileService.updateUserProfile(req.user, userId, req.body);
         res.status(200).json({ message: "Profile updated successfully", updatedUser });
     } catch (error) {
         res.status(500).json({ error: 'Failed to update profile' });
