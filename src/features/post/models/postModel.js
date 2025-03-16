@@ -109,6 +109,7 @@ exports.getAllPosts = async (userId) => {
         select: {
           name: true,
           id: true, // Include the author's userId for comparison
+          username:true,
         },
       },
       comments: true,
@@ -146,6 +147,7 @@ exports.getAllPosts = async (userId) => {
         select: {
           name: true,
           id: true,
+          username:true,
         },
       },
       comments: true,
