@@ -78,6 +78,8 @@ exports.getPost = async (postId) => {
       user: {
         select: {
           name: true,
+          id: true,
+          username: true,
         },
       },
       comments: true,
