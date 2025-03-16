@@ -51,10 +51,19 @@ await activityModel.createActivity({
   return comment;
 };
 
-// Get a single comment by ID
+// Get a single comment by ID (now includes user info)
 exports.getComment = async (commentId) => {
   return await prisma.comment.findUnique({
     where: { id: commentId },
+    include: {
+      user: {  // ✅ Include user details
+        select: {
+          id: true,
+          name: true,
+          username: true,
+        },
+      },
+    },
   });
 };
 
@@ -66,7 +75,8 @@ exports.getCommentsForPost = async (postId) => {
       user: {
         select: {
           id: true,
-          name: true,  // ✅ Include the user's name
+          name: true,
+          username: true,
         },
       },
     },
