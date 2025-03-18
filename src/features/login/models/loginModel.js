@@ -6,10 +6,12 @@ exports.findUserByEmail = async (email) => {
         where: { email },
         select: {
             id: true,
+            name: true,
+            username: true,
             email: true,
             password: true,
             role: true,
-            status: true, // ✅ Ensure status is included
+            status: true,
         },
     });
 };
