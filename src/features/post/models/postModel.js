@@ -49,22 +49,22 @@ exports.createPost = async (postData) => {
 
     // Step 2.2: Create a notification for each friend
     const notifications = friendIds.map(friendId => ({
-      userId: friendId,         // Friend's user ID
-      targetId: post.id,        // ID of the post being notified about
-      targetType: NOTIFICATION_TYPES.POST, // Use constant for type
+      userId: friendId,
+      targetId: post.id,
+      targetType: NOTIFICATION_TYPES.POST,
       createdAt: new Date(),
     }));
 
     // Step 2.3: Create notifications for each friend
-    await notificationModel.createNotifications(notifications);  // Using the correct method for creating multiple notifications
+    await notificationModel.createNotifications(notifications);
   }
 
   // Step 3: Log the post activity in Activity table
   await activityModel.createActivity({
     userId: post.userId,
-    targetType: ACTIVITY_TYPES.POST,  // Activity type
-    targetId: post.id,  // Post ID
-    createdAt: new Date(), // Ensure timestamp is captured
+    targetType: ACTIVITY_TYPES.POST,
+    targetId: post.id,
+    createdAt: new Date(),
   });
 
   return post;
@@ -98,69 +98,93 @@ async function isFriend(userId, authorId) {
       ],
     },
   });
-  return friendship ? true : false;
+  return !!friendship;
 }
 
 // Get all posts - combining public posts and friends' posts
 exports.getAllPosts = async (userId) => {
-  // Step 1: Retrieve all public posts and store in List A
+  // Step 1: Check if the user is an ADMIN
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+
+  const isAdmin = user?.role === "ADMIN";
+
+  // If the user is an ADMIN, return all posts (public + friends)
+  if (isAdmin) {
+    return await prisma.post.findMany({
+      include: {
+        user: {
+          select: {
+            name: true,
+            id: true,
+            username: true,
+          },
+        },
+        comments: true,
+        likes: true,
+      },
+    });
+  }
+
+  // Step 2: Retrieve all public posts
   const publicPosts = await prisma.post.findMany({
     where: { visibility: 'public' },
     include: {
       user: {
         select: {
           name: true,
-          id: true, // Include the author's userId for comparison
-          username:true,
+          id: true,
+          username: true,
         },
       },
       comments: true,
       likes: true,
     },
-  }).then(posts => posts.map(post => ({ ...post, friendLabel: 'public' }))); // Label public posts as "public"
+  }).then(posts => posts.map(post => ({ ...post, friendLabel: 'public' })));
 
-  // Step 2: Get the list of friend IDs for the authenticated user
+  // Step 3: Get the list of friend IDs for the authenticated user
   let friendIds = await prisma.userFriends.findMany({
     where: {
       OR: [
-        { userId: userId },  // When the authenticated user is the "userId"
-        { friendId: userId }, // When the authenticated user is the "friendId"
+        { userId: userId },
+        { friendId: userId },
       ],
     },
     select: {
       userId: true,
       friendId: true,
     },
-  }).then((friends) => {
-    return friends.map((f) => (f.userId === userId ? f.friendId : f.userId));
-  });
+  }).then(friends => friends.map(f => (f.userId === userId ? f.friendId : f.userId)));
 
-  // Step 3: Automatically add the authenticated user's ID to the friend list to allow visibility to their own posts
-  friendIds.push(userId); // This ensures the user can see their own posts
+  // Step 4: Allow the user to see their own posts
+  friendIds.push(userId);
 
-  // Step 4: Retrieve all friends' posts and filter based on friend relationships
+  // Step 5: Retrieve all friends' posts
   const friendPosts = await prisma.post.findMany({
     where: {
       visibility: 'friends',
-      userId: { in: friendIds },  // Filter posts by friend IDs
+      userId: { in: friendIds },
     },
     include: {
       user: {
         select: {
           name: true,
           id: true,
-          username:true,
+          username: true,
         },
       },
       comments: true,
       likes: true,
     },
-  }).then(posts => posts.map(post => ({ ...post, friendLabel: "friend's post" }))); // Label friend posts as "friend's post"
+  }).then(posts => posts.map(post => ({ ...post, friendLabel: "friend's post" })));
 
-  // Step 5: Combine List A (public posts) and List C (friends' posts) and return
+  // Step 6: Combine and return public + friends' posts
   return [...publicPosts, ...friendPosts];
 };
 
+// Get all posts with likes count
 exports.getAllPostsWithLikesCount = async () => {
   return await prisma.post.findMany({
     include: {
@@ -179,6 +203,7 @@ exports.getAllPostsWithLikesCount = async () => {
   });
 };
 
+// Get posts liked by a specific user
 exports.getPostsLikedByUser = async (userId) => {
   return await prisma.post.findMany({
     where: {
@@ -191,6 +216,7 @@ exports.getPostsLikedByUser = async (userId) => {
   });
 };
 
+// Update a post
 exports.updatePost = async (postId, postData) => {
   return await prisma.post.update({
     where: { id: postId },
@@ -198,6 +224,7 @@ exports.updatePost = async (postId, postData) => {
   });
 };
 
+// Delete a post
 exports.deletePost = async (postId) => {
   return await prisma.post.delete({
     where: { id: postId },
