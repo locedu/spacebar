@@ -32,7 +32,7 @@ exports.likePost = async (likeData) => {
     const notification = {
       userId: post.userId,         // The author of the post
       targetType: NOTIFICATION_TYPES.LIKE, // Notification type: LIKE
-      targetId: like.id,        // ID of the like being notified about
+      targetId: like.postId,        // ID of the like being notified about
       createdAt: new Date(),
     };
 
