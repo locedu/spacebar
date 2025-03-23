@@ -32,7 +32,7 @@ exports.createComment = async (commentData) => {
     const notification = {
       userId: post.userId,         // The author of the post
       targetType: NOTIFICATION_TYPES.COMMENT, // Notification type: COMMENT
-      targetId: comment.id,        // ID of the comment being notified about
+      targetId: comment.postId,        // temp: ID of post, as currently we are only displaying the related post.
       createdAt: new Date(),
     };
 
